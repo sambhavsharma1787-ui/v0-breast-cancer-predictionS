@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PredictionResults } from "./prediction-results"
+import { ImageUpload } from "./image-upload"
 
 interface FormData {
   radius: string
@@ -22,6 +23,10 @@ interface FormData {
   alcohol: "none" | "moderate" | "frequent"
   exercise: "sedentary" | "moderate" | "active"
   bmi: string
+}
+
+interface InputMethod {
+  type: "manual" | "image"
 }
 
 interface RiskResult {
@@ -51,11 +56,33 @@ export function PredictionForm() {
   const [error, setError] = useState("")
   const [displayMode, setDisplayMode] = useState<DisplayMode>("form")
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
+  const [inputMethod, setInputMethod] = useState<InputMethod["type"]>("image")
 
   function handleChange(field: keyof FormData, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }))
     setResult(null)
     setError("")
+  }
+
+  function handleMeasurementsExtracted(measurements: {
+    radius: number
+    texture: number
+    perimeter: number
+    area: number
+  }) {
+    setFormData((prev) => ({
+      ...prev,
+      radius: measurements.radius.toString(),
+      texture: measurements.texture.toString(),
+      perimeter: measurements.perimeter.toString(),
+      area: measurements.area.toString(),
+    }))
+    setError("")
+    setExpandedSection(null)
+  }
+
+  function handleUploadError(errorMsg: string) {
+    setError(errorMsg)
   }
 
   function calculateRiskScore(): RiskResult {
@@ -248,17 +275,53 @@ export function PredictionForm() {
           </p>
         </div>
 
-        <div className="mx-auto mt-12 max-w-3xl">
-          <Card className="border-border bg-card shadow-lg">
-            <CardHeader className="border-b border-border pb-6">
-              <CardTitle className="flex items-center gap-3 font-display text-xl text-card-foreground">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Activity className="h-5 w-5 text-primary" />
-                </div>
-                Medical Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
+        <div className="mx-auto mt-12 max-w-3xl space-y-8">
+          {/* Input Method Selector */}
+          <div className="flex gap-4">
+            <Button
+              onClick={() => {
+                setInputMethod("image")
+                setError("")
+              }}
+              variant={inputMethod === "image" ? "default" : "outline"}
+              size="lg"
+              className="flex-1 font-semibold"
+            >
+              📷 Upload Image
+            </Button>
+            <Button
+              onClick={() => {
+                setInputMethod("manual")
+                setError("")
+              }}
+              variant={inputMethod === "manual" ? "default" : "outline"}
+              size="lg"
+              className="flex-1 font-semibold"
+            >
+              ✋ Manual Entry
+            </Button>
+          </div>
+
+          {/* Image Upload Section */}
+          {inputMethod === "image" && (
+            <ImageUpload
+              onMeasurementsExtracted={handleMeasurementsExtracted}
+              onError={handleUploadError}
+            />
+          )}
+
+          {/* Manual Entry Form */}
+          {inputMethod === "manual" && (
+            <Card className="border-border bg-card shadow-lg">
+              <CardHeader className="border-b border-border pb-6">
+                <CardTitle className="flex items-center gap-3 font-display text-xl text-card-foreground">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <Activity className="h-5 w-5 text-primary" />
+                  </div>
+                  Medical Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
               <form onSubmit={handlePredict} className="grid gap-8">
                 {/* Cell Measurements Section */}
                 <div>
@@ -544,6 +607,7 @@ export function PredictionForm() {
               </div>
             </CardContent>
           </Card>
+          )}
         </div>
       </div>
     </section>
