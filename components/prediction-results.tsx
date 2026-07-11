@@ -12,6 +12,17 @@ interface RiskResult {
   recommendations: string[]
 }
 
+interface RiskLevel {
+  bg: string
+  border: string
+  icon: React.ComponentType<{ className?: string }>
+  iconColor: string
+  textColor: string
+  label: string
+  description: string
+  actionLevel: string
+}
+
 export function PredictionResults({
   result,
   onReset,
@@ -19,7 +30,7 @@ export function PredictionResults({
   result: RiskResult
   onReset: () => void
 }) {
-  const getRiskColor = () => {
+  const getRiskColor = (): RiskLevel => {
     switch (result.riskCategory) {
       case "high":
         return {
@@ -29,6 +40,8 @@ export function PredictionResults({
           iconColor: "text-destructive",
           textColor: "text-destructive",
           label: "High Risk",
+          description: "Your assessment indicates elevated risk factors requiring immediate medical attention.",
+          actionLevel: "Urgent - Seek Specialist Consultation",
         }
       case "moderate":
         return {
@@ -38,6 +51,8 @@ export function PredictionResults({
           iconColor: "text-yellow-600",
           textColor: "text-yellow-700",
           label: "Moderate Risk",
+          description: "Your assessment indicates moderate risk. Regular screening and proactive management are important.",
+          actionLevel: "Recommended - Schedule Annual Screening",
         }
       case "low":
       default:
@@ -48,6 +63,8 @@ export function PredictionResults({
           iconColor: "text-chart-4",
           textColor: "text-chart-4",
           label: "Low Risk",
+          description: "Your assessment indicates lower risk. Continue with standard screening guidelines for your age.",
+          actionLevel: "Routine - Follow Standard Guidelines",
         }
     }
   }
@@ -71,28 +88,57 @@ export function PredictionResults({
           <Card className="border-border bg-card shadow-lg overflow-hidden">
             {/* Risk Score Header */}
             <div className={`${colors.bg} border-b ${colors.border} px-6 py-8`}>
-              <div className="flex items-center gap-4">
-                <div className={`flex h-16 w-16 items-center justify-center rounded-full ${colors.bg} border-2 ${colors.border}`}>
-                  <IconComponent className={`h-8 w-8 ${colors.iconColor}`} />
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`flex h-20 w-20 items-center justify-center rounded-full ${colors.bg} border-2 ${colors.border}`}>
+                    <IconComponent className={`h-10 w-10 ${colors.iconColor}`} />
+                  </div>
+                  <div>
+                    <p className={`font-display text-4xl font-bold ${colors.textColor}`}>
+                      {result.riskScore}%
+                    </p>
+                    <p className={`text-sm font-semibold ${colors.textColor}`}>Risk Score</p>
+                    <p className={`text-xs font-medium ${colors.textColor} opacity-75 mt-1`}>
+                      {colors.actionLevel}
+                    </p>
+                  </div>
                 </div>
                 <div>
-                  <p className={`font-display text-3xl font-bold ${colors.textColor}`}>
-                    {result.riskScore}%
+                  <p className={`font-display text-2xl font-bold ${colors.textColor}`}>
+                    {colors.label}
                   </p>
-                  <p className={`text-sm font-semibold ${colors.textColor}`}>Risk Score</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {colors.description}
+                  </p>
                 </div>
               </div>
-              <p className={`mt-4 font-display text-2xl font-bold ${colors.textColor}`}>
-                {colors.label}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {result.riskCategory === "high" &&
-                  "Your risk assessment indicates elevated risk. Please consult with a healthcare provider immediately."}
-                {result.riskCategory === "moderate" &&
-                  "Your risk assessment indicates moderate risk. Regular screening and lifestyle modifications are recommended."}
-                {result.riskCategory === "low" &&
-                  "Your risk assessment indicates low risk. Continue with routine screening as recommended for your age."}
-              </p>
+
+              {/* Risk Score Visualization */}
+              <div className="mt-6 space-y-2">
+                <div className="flex justify-between text-xs font-medium text-muted-foreground">
+                  <span>Low Risk</span>
+                  <span>Moderate Risk</span>
+                  <span>High Risk</span>
+                </div>
+                <div className="h-2 rounded-full bg-muted overflow-hidden flex">
+                  <div className="h-full bg-chart-4 flex-1"></div>
+                  <div className="h-full bg-yellow-500 flex-1"></div>
+                  <div className="h-full bg-destructive flex-1"></div>
+                </div>
+                <div className="flex justify-between text-xs font-medium text-muted-foreground">
+                  <span>0%</span>
+                  <span>50%</span>
+                  <span>100%</span>
+                </div>
+                <div
+                  className="h-1 rounded-full bg-primary mt-1"
+                  style={{
+                    width: `${result.riskScore}%`,
+                    marginTop: "-8px",
+                    paddingTop: "4px",
+                  }}
+                />
+              </div>
             </div>
 
             <CardContent className="pt-8">
