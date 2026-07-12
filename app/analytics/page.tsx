@@ -1,6 +1,5 @@
 import { DashboardLayout } from '@/components/dashboard-layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 const riskTrendData = [
   { month: 'Jan', risk: 32 },
@@ -42,15 +41,20 @@ export default function AnalyticsPage() {
             <CardDescription>Your average risk score over the past 6 months</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={riskTrendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="risk" stroke="#0ea5e9" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+            <div className="space-y-4">
+              {riskTrendData.map((item) => (
+                <div key={item.month} className="flex items-center gap-4">
+                  <span className="w-12 font-medium text-sm text-slate-600">{item.month}</span>
+                  <div className="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-blue-500 h-full rounded-full"
+                      style={{ width: `${item.risk}%` }}
+                    />
+                  </div>
+                  <span className="w-12 text-right font-semibold text-slate-900">{item.risk}%</span>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -62,15 +66,20 @@ export default function AnalyticsPage() {
               <CardDescription>Most influential features for your risk</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={featureImpactData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="feature" angle={-45} textAnchor="end" height={80} />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="impact" fill="#0ea5e9" />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="space-y-3">
+                {featureImpactData.map((item) => (
+                  <div key={item.feature} className="flex items-center gap-3">
+                    <span className="w-24 text-sm font-medium text-slate-600">{item.feature}</span>
+                    <div className="flex-1 bg-slate-200 rounded h-6 overflow-hidden">
+                      <div
+                        className="bg-blue-500 h-full rounded"
+                        style={{ width: `${item.impact * 3}%` }}
+                      />
+                    </div>
+                    <span className="w-12 text-right font-semibold text-slate-900">{item.impact}</span>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -81,25 +90,27 @@ export default function AnalyticsPage() {
               <CardDescription>Breakdown of your predictions by risk category</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={riskDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name} (${value}%)`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {riskDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="space-y-4">
+                {riskDistribution.map((item) => (
+                  <div key={item.name} className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="text-sm font-medium text-slate-600">{item.name}</span>
+                    <div className="flex-1 bg-slate-200 rounded h-2 overflow-hidden">
+                      <div
+                        className="h-full rounded"
+                        style={{
+                          width: `${item.value}%`,
+                          backgroundColor: item.color,
+                        }}
+                      />
+                    </div>
+                    <span className="w-12 text-right font-semibold text-slate-900">{item.value}%</span>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
