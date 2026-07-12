@@ -1,5 +1,7 @@
+'use server'
+
 import { db } from './db'
-import { doctors, specialties, doctorAvailability } from './db/schema'
+import { doctors, specialties, doctorAvailability, type Doctor } from './db/schema'
 import { eq, and, lte, gte, desc } from 'drizzle-orm'
 
 export interface DoctorSearchFilters {
@@ -12,7 +14,7 @@ export interface DoctorSearchFilters {
   isAvailableNow?: boolean
 }
 
-export interface DoctorWithDistance extends typeof doctors.$inferSelect {
+export interface DoctorWithDistance extends Doctor {
   distance?: number
 }
 

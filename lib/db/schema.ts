@@ -6,7 +6,6 @@ import {
   numeric,
   integer,
   varchar,
-  array,
 } from "drizzle-orm/pg-core";
 
 // Better Auth Tables
@@ -136,7 +135,7 @@ export const doctors = pgTable("doctors", {
   email: text("email"),
   phone: text("phone"),
   bio: text("bio"),
-  qualifications: array(text("qualifications")),
+  qualifications: text("qualifications"),
   experience: integer("experience"),
   rating: numeric("rating").default("0"),
   reviewCount: integer("reviewCount").default(0),
