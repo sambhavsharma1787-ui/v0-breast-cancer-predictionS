@@ -6,6 +6,7 @@ import {
   numeric,
   integer,
   varchar,
+  array,
 } from "drizzle-orm/pg-core";
 
 // Better Auth Tables
@@ -118,6 +119,87 @@ export const apiKeys = pgTable("api_keys", {
   expiresAt: timestamp("expiresAt"),
 });
 
+// Doctor Finder Tables
+export const specialties = pgTable("specialties", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  icon: text("icon"),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export const doctors = pgTable("doctors", {
+  id: text("id").primaryKey(),
+  userId: text("userId").references(() => user.id),
+  name: text("name").notNull(),
+  specialtyId: text("specialtyId").references(() => specialties.id),
+  email: text("email"),
+  phone: text("phone"),
+  bio: text("bio"),
+  qualifications: array(text("qualifications")),
+  experience: integer("experience"),
+  rating: numeric("rating").default("0"),
+  reviewCount: integer("reviewCount").default(0),
+  latitude: numeric("latitude"),
+  longitude: numeric("longitude"),
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  zipCode: text("zipCode"),
+  profileImage: text("profileImage"),
+  availabilityStart: text("availabilityStart"),
+  availabilityEnd: text("availabilityEnd"),
+  consultationFee: numeric("consultationFee"),
+  isVerified: boolean("isVerified").default(false),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export const doctorAvailability = pgTable("doctor_availability", {
+  id: text("id").primaryKey(),
+  doctorId: text("doctorId").notNull().references(() => doctors.id),
+  dayOfWeek: integer("dayOfWeek"),
+  startTime: text("startTime"),
+  endTime: text("endTime"),
+  isAvailable: boolean("isAvailable").default(true),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export const appointments = pgTable("appointments", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id),
+  doctorId: text("doctorId").notNull().references(() => doctors.id),
+  appointmentDate: timestamp("appointmentDate").notNull(),
+  duration: integer("duration"),
+  consultationType: text("consultationType"),
+  status: varchar("status").default("scheduled"),
+  notes: text("notes"),
+  remindAt: timestamp("remindAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export const doctorReviews = pgTable("doctor_reviews", {
+  id: text("id").primaryKey(),
+  doctorId: text("doctorId").notNull().references(() => doctors.id),
+  userId: text("userId").notNull().references(() => user.id),
+  rating: integer("rating").notNull(),
+  title: text("title"),
+  comment: text("comment"),
+  verified: boolean("verified").default(false),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull().references(() => user.id),
+  doctorId: text("doctorId").notNull().references(() => doctors.id),
+  message: text("message").notNull(),
+  senderType: text("senderType"),
+  isRead: boolean("isRead").default(false),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
 // Type exports
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
@@ -133,3 +215,21 @@ export type NewInsight = typeof insights.$inferInsert;
 
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type NewApiKey = typeof apiKeys.$inferInsert;
+
+export type Specialty = typeof specialties.$inferSelect;
+export type NewSpecialty = typeof specialties.$inferInsert;
+
+export type Doctor = typeof doctors.$inferSelect;
+export type NewDoctor = typeof doctors.$inferInsert;
+
+export type DoctorAvailability = typeof doctorAvailability.$inferSelect;
+export type NewDoctorAvailability = typeof doctorAvailability.$inferInsert;
+
+export type Appointment = typeof appointments.$inferSelect;
+export type NewAppointment = typeof appointments.$inferInsert;
+
+export type DoctorReview = typeof doctorReviews.$inferSelect;
+export type NewDoctorReview = typeof doctorReviews.$inferInsert;
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type NewChatMessage = typeof chatMessages.$inferInsert;
