@@ -35,37 +35,36 @@ const tips = [
 
 export function PreventionSection() {
   return (
-    <section id="prevention" className="bg-secondary px-6 py-20 md:py-28">
+    <section id="prevention" className="bg-gradient-to-b from-white to-primary/5 px-6 py-20 md:py-32">
       <div className="mx-auto max-w-6xl">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
-            Stay Healthy
+        <div className="mx-auto max-w-3xl text-center mb-16">
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">
+            💪 Prevention & Care
           </p>
-          <h2 className="mt-3 font-display text-3xl font-bold text-secondary-foreground md:text-4xl text-balance">
-            Prevention & Care
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground text-balance mb-6">
+            Take Proactive Steps Today
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-            Taking proactive steps can significantly reduce your risk. Here are
-            key practices recommended by healthcare professionals.
+          <p className="text-lg leading-relaxed text-muted-foreground">
+            Lifestyle choices make a real difference. These evidence-based practices recommended by healthcare professionals can help reduce your risk and support long-term health.
           </p>
         </div>
 
-        <div className="mx-auto mt-16 max-w-3xl">
-          <div className="flex flex-col gap-4">
+        <div className="mx-auto max-w-4xl">
+          <div className="grid gap-6 md:grid-cols-2">
             {tips.map((tip, index) => (
               <div
                 key={tip.title}
-                className="flex items-start gap-5 rounded-xl border border-border bg-card p-6 transition-shadow hover:shadow-lg"
+                className="flex items-start gap-5 rounded-2xl border border-border/30 bg-white backdrop-blur-sm p-7 transition-all hover:shadow-lg hover:border-primary/30 group overflow-hidden"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
-                  <tip.icon className="h-6 w-6" />
+                <div className="absolute -right-6 -top-6 w-20 h-20 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-all" />
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 group-hover:from-primary/30 group-hover:to-accent/30 transition-all">
+                  <tip.icon className="h-7 w-7 text-primary" />
                 </div>
-                <div>
-                  <h3 className="font-display text-lg font-semibold text-card-foreground">
-                    <span className="mr-2 text-primary">{index + 1}.</span>
+                <div className="relative">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {tip.title}
                   </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {tip.description}
                   </p>
                 </div>
