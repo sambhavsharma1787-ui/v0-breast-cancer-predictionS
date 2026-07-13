@@ -10,6 +10,8 @@ interface RiskResult {
   riskCategory: "low" | "moderate" | "high"
   riskFactors: string[]
   recommendations: string[]
+  photoUrl?: string
+  photoFileName?: string
 }
 
 export function PredictionResults({
@@ -96,6 +98,27 @@ export function PredictionResults({
             </div>
 
             <CardContent className="pt-8">
+              {/* Uploaded Photo */}
+              {result.photoUrl && (
+                <div className="mb-8">
+                  <h3 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Submitted Photo
+                  </h3>
+                  <div className="rounded-lg overflow-hidden border border-border/30 bg-muted p-4">
+                    <img
+                      src={result.photoUrl}
+                      alt="Medical assessment photo"
+                      className="max-h-64 w-auto mx-auto object-contain"
+                    />
+                    {result.photoFileName && (
+                      <p className="text-xs text-muted-foreground mt-3 text-center">
+                        File: {result.photoFileName}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Identified Risk Factors */}
               {result.riskFactors.length > 0 && (
                 <div className="mb-8">

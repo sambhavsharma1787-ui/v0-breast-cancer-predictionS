@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PredictionResults } from "./prediction-results"
+import { PhotoUpload } from "./photo-upload"
 
 interface FormData {
   radius: string
@@ -29,6 +30,8 @@ interface RiskResult {
   riskCategory: "low" | "moderate" | "high"
   riskFactors: string[]
   recommendations: string[]
+  photoUrl?: string
+  photoFileName?: string
 }
 
 type DisplayMode = "form" | "results" | null
@@ -47,6 +50,7 @@ export function PredictionForm() {
     exercise: "moderate",
     bmi: "",
   })
+  const [uploadedPhoto, setUploadedPhoto] = useState<{ url: string; fileName: string } | null>(null)
   const [result, setResult] = useState<RiskResult | null>(null)
   const [error, setError] = useState("")
   const [displayMode, setDisplayMode] = useState<DisplayMode>("form")
@@ -56,6 +60,14 @@ export function PredictionForm() {
     setFormData((prev) => ({ ...prev, [field]: value }))
     setResult(null)
     setError("")
+  }
+
+  function handlePhotoUpload(url: string, fileName: string) {
+    setUploadedPhoto({ url, fileName })
+  }
+
+  function handlePhotoRemove() {
+    setUploadedPhoto(null)
   }
 
   function calculateRiskScore(): RiskResult {
@@ -200,6 +212,11 @@ export function PredictionForm() {
     }
 
     const riskResult = calculateRiskScore()
+    // Add photo information to results
+    if (uploadedPhoto) {
+      riskResult.photoUrl = uploadedPhoto.url
+      riskResult.photoFileName = uploadedPhoto.fileName
+    }
     setResult(riskResult)
     setDisplayMode("results")
     setError("")
@@ -219,6 +236,7 @@ export function PredictionForm() {
       exercise: "moderate",
       bmi: "",
     })
+    setUploadedPhoto(null)
     setResult(null)
     setError("")
     setDisplayMode("form")
@@ -260,6 +278,15 @@ export function PredictionForm() {
             </CardHeader>
             <CardContent className="pt-6">
               <form onSubmit={handlePredict} className="grid gap-8">
+                {/* Photo Upload Section */}
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-6">
+                  <PhotoUpload
+                    onPhotoUpload={handlePhotoUpload}
+                    onPhotoRemove={handlePhotoRemove}
+                    uploadedPhoto={uploadedPhoto}
+                  />
+                </div>
+
                 {/* Cell Measurements Section */}
                 <div>
                   <button
