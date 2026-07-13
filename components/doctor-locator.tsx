@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { MapPin, Phone, Star, Clock, AlertCircle, Loader } from "lucide-react"
+import { MapPin, Phone, Star, Clock, AlertCircle, Loader, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,9 +13,14 @@ interface Doctor {
   address: string
   phone?: string
   rating?: number
+  reviewCount?: number
   isOpen?: boolean | null
   distance?: number
   type: "oncologist" | "hospital" | "clinic"
+  specialties?: string[]
+  website?: string
+  services?: string[]
+  operatingHours?: string
 }
 
 export function DoctorLocator() {
@@ -243,66 +248,108 @@ export function DoctorLocator() {
                   className="border-border/30 bg-white backdrop-blur-sm transition-all hover:shadow-lg hover:border-primary/30 group"
                 >
                   <CardContent className="p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-foreground text-lg">{doctor.name}</h3>
-                          {doctor.type === "oncologist" && (
-                            <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                              Oncologist
-                            </span>
-                          )}
-                          {doctor.type === "hospital" && (
-                            <span className="px-2 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
-                              Hospital
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="space-y-2 text-sm text-muted-foreground">
-                          <div className="flex items-start gap-2">
-                            <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5 text-primary" />
-                            <p>{doctor.address}</p>
+                    <div className="space-y-4">
+                      {/* Header with name and badges */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="font-semibold text-foreground text-lg mb-2">{doctor.name}</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {doctor.type === "oncologist" && (
+                              <span className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                                Oncologist
+                              </span>
+                            )}
+                            {doctor.type === "hospital" && (
+                              <span className="px-2 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+                                Hospital
+                              </span>
+                            )}
+                            {doctor.type === "clinic" && (
+                              <span className="px-2 py-1 rounded-full bg-secondary/40 text-secondary-foreground text-xs font-medium">
+                                Medical Clinic
+                              </span>
+                            )}
+                            {doctor.specialties && doctor.specialties.map((specialty) => (
+                              <span key={specialty} className="px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                                {specialty}
+                              </span>
+                            ))}
                           </div>
-
-                          {doctor.phone && (
-                            <div className="flex items-center gap-2">
-                              <Phone className="h-4 w-4 flex-shrink-0 text-primary" />
-                              <a href={`tel:${doctor.phone}`} className="hover:text-primary transition-colors">
-                                {doctor.phone}
-                              </a>
+                        </div>
+                        {doctor.distance && (
+                          <div className="text-right">
+                            <div className="text-lg font-semibold text-primary">
+                              {doctor.distance.toFixed(1)} km
                             </div>
-                          )}
+                            <div className="text-xs text-muted-foreground">away</div>
+                          </div>
+                        )}
+                      </div>
 
-                          <div className="flex items-center gap-4 pt-2">
-                            {doctor.rating && (
-                              <div className="flex items-center gap-1">
-                                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                                <span className="text-xs">{doctor.rating.toFixed(1)}</span>
-                              </div>
-                            )}
+                      {/* Contact information */}
+                      <div className="space-y-2 text-sm text-muted-foreground border-t border-border/20 pt-4">
+                        <div className="flex items-start gap-3">
+                          <MapPin className="h-4 w-4 flex-shrink-0 mt-0.5 text-primary" />
+                          <p className="text-foreground">{doctor.address}</p>
+                        </div>
 
-                            {doctor.isOpen !== null && (
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4 text-primary" />
-                                <span className="text-xs">
-                                  {doctor.isOpen ? (
-                                    <span className="text-green-600">Open Now</span>
-                                  ) : (
-                                    <span className="text-red-600">Closed</span>
-                                  )}
-                                </span>
-                              </div>
-                            )}
+                        {doctor.phone && (
+                          <div className="flex items-center gap-3">
+                            <Phone className="h-4 w-4 flex-shrink-0 text-primary" />
+                            <a href={`tel:${doctor.phone}`} className="text-foreground hover:text-primary transition-colors font-medium">
+                              {doctor.phone}
+                            </a>
+                          </div>
+                        )}
+                      </div>
 
-                            {doctor.distance && (
-                              <div className="text-xs text-muted-foreground">
-                                {doctor.distance.toFixed(1)} km away
-                              </div>
+                      {/* Stats and status */}
+                      <div className="flex flex-wrap gap-4 border-t border-border/20 pt-4 text-sm">
+                        {doctor.rating && (
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                            <span className="font-semibold">{doctor.rating.toFixed(1)}</span>
+                            {doctor.reviewCount && (
+                              <span className="text-muted-foreground">({doctor.reviewCount} reviews)</span>
                             )}
                           </div>
-                        </div>
+                        )}
+
+                        {doctor.isOpen !== null && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-primary" />
+                            <span className="font-medium">
+                              {doctor.isOpen ? (
+                                <span className="text-green-600">Open Now</span>
+                              ) : (
+                                <span className="text-red-600">Closed</span>
+                              )}
+                            </span>
+                          </div>
+                        )}
+
+                        {doctor.website && (
+                          <a
+                            href={doctor.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline font-medium"
+                          >
+                            Visit Website
+                          </a>
+                        )}
                       </div>
+
+                      {/* Operating Hours */}
+                      {doctor.operatingHours && doctor.operatingHours !== "Not available" && (
+                        <div className="border-t border-border/20 pt-4">
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">Hours</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {doctor.operatingHours.split(" | ").slice(0, 3).join(" | ")}
+                            {doctor.operatingHours.split(" | ").length > 3 && "..."}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

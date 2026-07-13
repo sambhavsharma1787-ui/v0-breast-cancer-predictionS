@@ -12,9 +12,14 @@ interface Doctor {
   address: string
   phone?: string
   rating?: number
+  reviewCount?: number
   isOpen?: boolean | null
   distance?: number
   type: "oncologist" | "hospital" | "clinic"
+  specialties?: string[]
+  website?: string
+  services?: string[]
+  operatingHours?: string
 }
 
 // Geocode address to coordinates
@@ -69,7 +74,7 @@ async function searchNearbyDoctors(
             params: {
               place_id: place.place_id,
               fields:
-                "formatted_phone_number,opening_hours,business_status,geometry",
+                "formatted_phone_number,opening_hours,business_status,geometry,website,type,user_ratings_total",
               key: process.env.GOOGLE_PLACES_API_KEY,
             },
           }
@@ -85,15 +90,51 @@ async function searchNearbyDoctors(
           place.geometry.location.lng
         )
 
+        // Extract specialties based on place types
+        const specialties: string[] = []
+        if (place.types) {
+          if (place.types.includes("hospital")) {
+            specialties.push("Hospital")
+          }
+          if (place.types.includes("doctor") || place.types.includes("health")) {
+            specialties.push("Medical Clinic")
+          }
+          if (place.name.toLowerCase().includes("oncology") || 
+              place.name.toLowerCase().includes("cancer")) {
+            specialties.push("Oncology")
+          }
+          if (place.name.toLowerCase().includes("breast")) {
+            specialties.push("Breast Health")
+          }
+          if (place.name.toLowerCase().includes("surgery")) {
+            specialties.push("Surgical Oncology")
+          }
+        }
+
+        // Determine facility type
+        let facilityType: "oncologist" | "hospital" | "clinic" = "hospital"
+        if (place.types?.includes("doctor")) {
+          facilityType = "oncologist"
+        } else if (place.types?.includes("health")) {
+          facilityType = "clinic"
+        }
+
+        // Get opening hours formatted
+        const operatingHours = details.opening_hours?.weekday_text?.join(" | ") || "Not available"
+
         doctors.push({
           id: place.place_id,
           name: place.name,
           address: place.vicinity || place.formatted_address,
           phone: details.formatted_phone_number,
           rating: place.rating,
+          reviewCount: place.user_ratings_total,
           isOpen: details.opening_hours?.open_now ?? null,
           distance,
-          type: "hospital",
+          type: facilityType,
+          specialties: specialties.length > 0 ? specialties : ["Medical Facility"],
+          website: details.website,
+          operatingHours,
         })
       }
     }
