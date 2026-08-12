@@ -28,6 +28,7 @@ export function DoctorLocator() {
   const [isLoadingGeo, setIsLoadingGeo] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [doctors, setDoctors] = useState<Doctor[]>([])
+  const [searchedLocation, setSearchedLocation] = useState("")
   const [error, setError] = useState("")
   const [searchType, setSearchType] = useState<"current" | "manual">("manual")
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
@@ -111,9 +112,11 @@ export function DoctorLocator() {
       }
 
       const data = await response.json()
-      setDoctors(data.results || [])
+      const results = data.results || []
+      setDoctors(results)
+      setSearchedLocation(data.location || (searchType === "manual" ? location.trim() : "your current location"))
 
-      if (data.results.length === 0) {
+      if (results.length === 0) {
         setError("No doctors found in this area. Try a different location.")
       }
     } catch (err) {
@@ -239,9 +242,14 @@ export function DoctorLocator() {
           {/* Results */}
           {doctors.length > 0 && (
             <div className="space-y-4">
-              <p className="text-sm font-semibold text-muted-foreground">
-                Found {doctors.length} doctor{doctors.length !== 1 ? "s" : ""} & hospitals
-              </p>
+              <div className="flex flex-col gap-1 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                <p className="text-sm font-semibold text-foreground">
+                  {doctors.length} nearby care option{doctors.length !== 1 ? "s" : ""}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Results sorted by distance from {searchedLocation || "your selected location"}.
+                </p>
+              </div>
               {doctors.map((doctor) => (
                 <Card
                   key={doctor.id}
