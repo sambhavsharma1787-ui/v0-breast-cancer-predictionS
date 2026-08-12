@@ -7,6 +7,7 @@ const navLinks = [
   { label: "About", href: "#about" },
   { label: "Symptoms", href: "#symptoms" },
   { label: "Prediction", href: "#prediction" },
+  { label: "Hospitals", href: "#hospitals" },
   { label: "Prevention", href: "#prevention" },
 ]
 

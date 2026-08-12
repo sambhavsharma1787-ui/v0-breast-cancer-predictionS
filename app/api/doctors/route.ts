@@ -4,6 +4,7 @@ import axios from "axios"
 interface SearchRequest {
   location?: string
   coordinates?: { lat: number; lng: number }
+  mode?: "care" | "hospitals"
 }
 
 type FacilityType = "oncologist" | "hospital" | "clinic"
@@ -79,7 +80,9 @@ export async function POST(request: NextRequest) {
     else if (typeof body.location === "string" && body.location.trim()) center = await geocode(body.location.trim())
     if (!center) return NextResponse.json({ error: "Enter a valid city or address, or allow location access." }, { status: 400 })
 
-    const keywords = ["breast cancer oncologist", "cancer treatment hospital", "breast health clinic"]
+    const keywords = body.mode === "hospitals"
+      ? ["best cancer hospital", "breast cancer hospital", "oncology hospital"]
+      : ["breast cancer oncologist", "cancer treatment hospital", "breast health clinic"]
     const places = (await Promise.all(keywords.map((keyword) => nearby(center!.lat, center!.lng, keyword)))).flat()
     const unique = new Map<string, any>()
     for (const place of places) if (place.place_id && !unique.has(place.place_id)) unique.set(place.place_id, place)
@@ -104,7 +107,13 @@ export async function POST(request: NextRequest) {
         operatingHours: info.opening_hours?.weekday_text?.join(" | "),
       })
     }
-    results.sort((a, b) => a.distance - b.distance)
+    results.sort((a, b) => {
+      if (body.mode === "hospitals") {
+        const ratingDifference = (b.rating ?? 0) - (a.rating ?? 0)
+        if (ratingDifference !== 0) return ratingDifference
+      }
+      return a.distance - b.distance
+    })
     return NextResponse.json({ results, location: center.formattedAddress ?? body.location ?? "Current location", coordinates: { lat: center.lat, lng: center.lng } })
   } catch (error) {
     console.error("[v0] Location doctor search failed", error)
