@@ -21,6 +21,8 @@ interface Hospital {
   operatingHours?: string
 }
 
+const hospitalsEyebrow = "Trusted cancer care"
+
 const featuredHospitals = [
   {
     name: "Tata Memorial Hospital",
@@ -112,7 +114,7 @@ export function HospitalsSection() {
     <section id="hospitals" className="bg-muted/30 px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">Trusted cancer care</p>
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary">{hospitalsEyebrow}</p>
           <h2 className="mt-3 text-3xl font-bold text-foreground md:text-5xl text-balance">Top hospitals for breast cancer care</h2>
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
             Explore established Indian cancer-care centres, then search for hospitals near your own location.
