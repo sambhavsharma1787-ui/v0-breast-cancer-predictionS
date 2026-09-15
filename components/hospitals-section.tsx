@@ -61,6 +61,42 @@ const featuredHospitals = [
     focus: "Breast health, oncology, reconstructive surgery, and survivorship care",
     website: "https://www.amritahospitals.org",
   },
+  {
+    name: "Kidwai Memorial Institute of Oncology",
+    city: "Bengaluru, Karnataka",
+    focus: "Public cancer hospital providing screening, surgery, radiation, and medical oncology",
+    website: "https://kidwai.karnataka.gov.in",
+  },
+  {
+    name: "Adyar Cancer Institute",
+    city: "Chennai, Tamil Nadu",
+    focus: "Specialist cancer treatment, breast oncology, radiation, and affordable care",
+    website: "https://cancerinstitutewia.in",
+  },
+  {
+    name: "Narayana Health City",
+    city: "Bengaluru, Karnataka",
+    focus: "Multidisciplinary cancer care, breast surgery, diagnostics, and rehabilitation",
+    website: "https://www.narayanahealth.org",
+  },
+  {
+    name: "Apollo Cancer Centres",
+    city: "Chennai, Tamil Nadu",
+    focus: "Integrated oncology services, breast cancer surgery, chemotherapy, and radiation",
+    website: "https://www.apollohospitals.com/departments/cancer-care",
+  },
+  {
+    name: "Sanjay Gandhi Postgraduate Institute",
+    city: "Lucknow, Uttar Pradesh",
+    focus: "Advanced cancer diagnosis, oncology surgery, medical oncology, and research",
+    website: "https://sgpgims.org.in",
+  },
+  {
+    name: "Gujarat Cancer & Research Institute",
+    city: "Ahmedabad, Gujarat",
+    focus: "Comprehensive cancer services including breast screening and specialist treatment",
+    website: "https://www.gcriindia.org",
+  },
 ]
 
 export function HospitalsSection() {
