@@ -12,6 +12,7 @@ interface RiskResult {
   recommendations: string[]
   photoUrl?: string
   photoFileName?: string
+  photoAnalysis?: string
 }
 
 export function PredictionResults({
@@ -116,6 +117,13 @@ export function PredictionResults({
                       </p>
                     )}
                   </div>
+                  {result.photoAnalysis && (
+                    <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                      <p className="mb-2 text-sm font-semibold text-foreground">Non-diagnostic visual review</p>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{result.photoAnalysis}</p>
+                      <p className="mt-3 text-xs font-medium text-muted-foreground">This review cannot diagnose or rule out breast cancer. A qualified clinician must evaluate any concerning change.</p>
+                    </div>
+                  )}
                 </div>
               )}
 

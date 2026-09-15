@@ -32,6 +32,7 @@ interface RiskResult {
   recommendations: string[]
   photoUrl?: string
   photoFileName?: string
+  photoAnalysis?: string
 }
 
 type DisplayMode = "form" | "results" | null
@@ -50,7 +51,7 @@ export function PredictionForm() {
     exercise: "moderate",
     bmi: "",
   })
-  const [uploadedPhoto, setUploadedPhoto] = useState<{ url: string; fileName: string } | null>(null)
+  const [uploadedPhoto, setUploadedPhoto] = useState<{ url: string; fileName: string; analysis?: string } | null>(null)
   const [result, setResult] = useState<RiskResult | null>(null)
   const [error, setError] = useState("")
   const [displayMode, setDisplayMode] = useState<DisplayMode>("form")
@@ -62,8 +63,8 @@ export function PredictionForm() {
     setError("")
   }
 
-  function handlePhotoUpload(url: string, fileName: string) {
-    setUploadedPhoto({ url, fileName })
+  function handlePhotoUpload(url: string, fileName: string, analysis?: string) {
+    setUploadedPhoto({ url, fileName, analysis })
   }
 
   function handlePhotoRemove() {
@@ -215,8 +216,9 @@ export function PredictionForm() {
     // Add photo information to results
     if (uploadedPhoto) {
       riskResult.photoUrl = uploadedPhoto.url
-      riskResult.photoFileName = uploadedPhoto.fileName
-    }
+    riskResult.photoFileName = uploadedPhoto.fileName
+      riskResult.photoAnalysis = uploadedPhoto.analysis
+  }
     setResult(riskResult)
     setDisplayMode("results")
     setError("")

@@ -1,15 +1,15 @@
 "use client"
 
 import React, { useState, useRef } from "react"
-import { Upload, X, CheckCircle2, AlertCircle } from "lucide-react"
+import { Upload, X, CheckCircle2, AlertCircle, ScanSearch, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 
 interface PhotoUploadProps {
-  onPhotoUpload: (url: string, fileName: string) => void
+  onPhotoUpload: (url: string, fileName: string, analysis?: string) => void
   onPhotoRemove: () => void
-  uploadedPhoto?: { url: string; fileName: string } | null
+  uploadedPhoto?: { url: string; fileName: string; analysis?: string } | null
   disabled?: boolean
 }
 
@@ -21,14 +21,17 @@ export function PhotoUpload({
 }: PhotoUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [error, setError] = useState<string>("")
   const [preview, setPreview] = useState<string>("")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
     setError("")
+    setSelectedFile(file)
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
@@ -78,6 +81,24 @@ export function PhotoUpload({
     }
   }
 
+  const handleAnalyze = async () => {
+    if (!selectedFile || !uploadedPhoto || isAnalyzing) return
+    setIsAnalyzing(true)
+    setError("")
+    try {
+      const body = new FormData()
+      body.append("file", selectedFile)
+      const response = await fetch("/api/photo-analysis", { method: "POST", body })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || "Analysis failed")
+      onPhotoUpload(uploadedPhoto.url, uploadedPhoto.fileName, data.analysis)
+    } catch (analysisError) {
+      setError(analysisError instanceof Error ? analysisError.message : "Analysis failed. Please consult a clinician.")
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div>
@@ -101,12 +122,13 @@ export function PhotoUpload({
                     <span className="font-medium">File:</span> {uploadedPhoto.fileName}
                   </p>
                   <div className="mt-4 rounded-lg overflow-hidden bg-white">
-                    <img
-                      src={uploadedPhoto.url}
-                      alt="Uploaded medical photo"
-                      className="max-h-48 w-auto object-contain"
-                    />
+                    <img src={uploadedPhoto.url} alt="Uploaded medical photo" className="max-h-48 w-auto object-contain" />
                   </div>
+                  <Button type="button" variant="outline" onClick={handleAnalyze} disabled={disabled || isAnalyzing} className="mt-4 w-full">
+                    {isAnalyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ScanSearch className="mr-2 h-4 w-4" />}
+                    {isAnalyzing ? "Reviewing image..." : uploadedPhoto.analysis ? "Re-run visual review" : "Run visual review"}
+                  </Button>
+                  {uploadedPhoto.analysis && <p className="mt-3 rounded-lg bg-muted p-3 text-sm text-muted-foreground">{uploadedPhoto.analysis}</p>}
                 </div>
               </div>
               <Button

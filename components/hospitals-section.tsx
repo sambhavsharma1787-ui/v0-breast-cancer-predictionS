@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 interface Hospital {
   id: string
   name: string
+  type?: "oncologist" | "hospital" | "clinic"
   address: string
   phone?: string
   rating?: number
