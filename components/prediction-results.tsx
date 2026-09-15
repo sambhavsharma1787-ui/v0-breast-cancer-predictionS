@@ -10,6 +10,9 @@ interface RiskResult {
   riskCategory: "low" | "moderate" | "high"
   riskFactors: string[]
   recommendations: string[]
+  photoUrl?: string
+  photoFileName?: string
+  photoAnalysis?: string
 }
 
 export function PredictionResults({
@@ -96,6 +99,34 @@ export function PredictionResults({
             </div>
 
             <CardContent className="pt-8">
+              {/* Uploaded Photo */}
+              {result.photoUrl && (
+                <div className="mb-8">
+                  <h3 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Submitted Photo
+                  </h3>
+                  <div className="rounded-lg overflow-hidden border border-border/30 bg-muted p-4">
+                    <img
+                      src={result.photoUrl}
+                      alt="Medical assessment photo"
+                      className="max-h-64 w-auto mx-auto object-contain"
+                    />
+                    {result.photoFileName && (
+                      <p className="text-xs text-muted-foreground mt-3 text-center">
+                        File: {result.photoFileName}
+                      </p>
+                    )}
+                  </div>
+                  {result.photoAnalysis && (
+                    <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                      <p className="mb-2 text-sm font-semibold text-foreground">Non-diagnostic visual review</p>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{result.photoAnalysis}</p>
+                      <p className="mt-3 text-xs font-medium text-muted-foreground">This review cannot diagnose or rule out breast cancer. A qualified clinician must evaluate any concerning change.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Identified Risk Factors */}
               {result.riskFactors.length > 0 && (
                 <div className="mb-8">

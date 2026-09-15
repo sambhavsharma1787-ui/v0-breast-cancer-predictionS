@@ -4,6 +4,9 @@ import { AboutSection } from "@/components/about-section"
 import { SymptomsSection } from "@/components/symptoms-section"
 import { PredictionForm } from "@/components/prediction-form"
 import { PreventionSection } from "@/components/prevention-section"
+import { DoctorLocator } from "@/components/doctor-locator"
+import { DoctorDirectory } from "@/components/doctor-directory"
+import { HospitalsSection } from "@/components/hospitals-section"
 import { SiteFooter } from "@/components/site-footer"
 
 export default function Page() {
@@ -15,6 +18,9 @@ export default function Page() {
         <AboutSection />
         <SymptomsSection />
         <PredictionForm />
+        <DoctorLocator />
+        <HospitalsSection />
+        <DoctorDirectory />
         <PreventionSection />
       </main>
       <SiteFooter />
