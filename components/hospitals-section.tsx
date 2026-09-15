@@ -137,7 +137,7 @@ export function HospitalsSection() {
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Unable to find hospitals")
-      setHospitals((data.results || []).filter((item: Hospital) => item.type === "hospital"))
+      setHospitals(data.results || [])
       setSearchedLocation(data.location || location || "your current location")
     } catch (searchError) {
       setError(searchError instanceof Error ? searchError.message : "Unable to find hospitals right now.")
