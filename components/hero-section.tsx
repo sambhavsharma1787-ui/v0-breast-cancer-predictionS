@@ -13,15 +13,15 @@ export function HeroSection() {
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
               <Heart className="h-4 w-4 fill-current" />
-              <span>Early Detection Saves Lives</span>
+              <span>Educational machine-learning demo</span>
             </div>
 
             <h1 className="text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl text-balance mb-6">
-              Breast Cancer Screening Made Simple
+              Explore a breast-cell classifier
             </h1>
 
             <p className="text-lg leading-relaxed text-white/90 mb-8">
-              Get an intelligent risk assessment using medical data. Learn about symptoms, prevention strategies, and take control of your health.
+              See how a logistic-regression model classifies four cell measurements from a public research dataset. This experiment is not for diagnosis or clinical use.
             </p>
 
             <div className="flex flex-col gap-4 sm:flex-row">
@@ -30,7 +30,7 @@ export function HeroSection() {
                 size="lg"
                 className="bg-white text-primary hover:bg-white/90 font-semibold px-8 shadow-lg"
               >
-                <a href="#prediction">Get Risk Assessment</a>
+                <a href="#prediction">Try the demo</a>
               </Button>
               <Button
                 asChild

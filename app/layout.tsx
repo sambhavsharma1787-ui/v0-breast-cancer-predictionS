@@ -8,8 +8,8 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 
 export const metadata: Metadata = {
-  title: 'Breast Cancer Prediction | Early Detection Saves Lives',
-  description: 'A medical data-driven breast cancer prediction tool for early detection and risk assessment. Learn about symptoms, prevention, and get a quick risk evaluation.',
+  title: 'Breast Cell Classifier | Educational Model Demo',
+  description: 'Explore an educational logistic-regression model trained on the Wisconsin Diagnostic Breast Cancer dataset. Not for clinical use or diagnosis.',
 }
 
 export const viewport: Viewport = {
