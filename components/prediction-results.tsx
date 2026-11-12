@@ -1,15 +1,12 @@
 "use client"
 
-import React from "react"
-import { AlertTriangle, CheckCircle2, Info, AlertCircle, ArrowLeft } from "lucide-react"
+import { AlertTriangle, ArrowLeft, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-interface RiskResult {
-  riskScore: number
-  riskCategory: "low" | "moderate" | "high"
-  riskFactors: string[]
-  recommendations: string[]
+interface PredictionResult {
+  prediction: "benign-pattern" | "malignant-pattern"
+  modelVersion: string
   photoUrl?: string
   photoFileName?: string
   photoAnalysis?: string
@@ -19,221 +16,76 @@ export function PredictionResults({
   result,
   onReset,
 }: {
-  result: RiskResult
+  result: PredictionResult
   onReset: () => void
 }) {
-  const getRiskColor = () => {
-    switch (result.riskCategory) {
-      case "high":
-        return {
-          bg: "bg-destructive/10",
-          border: "border-destructive/30",
-          icon: AlertTriangle,
-          iconColor: "text-destructive",
-          textColor: "text-destructive",
-          label: "High Risk",
-        }
-      case "moderate":
-        return {
-          bg: "bg-yellow-100",
-          border: "border-yellow-300",
-          icon: AlertCircle,
-          iconColor: "text-yellow-600",
-          textColor: "text-yellow-700",
-          label: "Moderate Risk",
-        }
-      case "low":
-      default:
-        return {
-          bg: "bg-chart-4/10",
-          border: "border-chart-4/30",
-          icon: CheckCircle2,
-          iconColor: "text-chart-4",
-          textColor: "text-chart-4",
-          label: "Low Risk",
-        }
-    }
-  }
-
-  const colors = getRiskColor()
-  const IconComponent = colors.icon
+  const malignantPattern = result.prediction === "malignant-pattern"
 
   return (
     <section id="results" className="px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-2xl">
-          <Button
-            variant="ghost"
-            onClick={onReset}
-            className="mb-8 gap-2 text-primary hover:bg-primary/10"
-          >
+          <Button variant="ghost" onClick={onReset} className="mb-8 gap-2 text-primary hover:bg-primary/10">
             <ArrowLeft className="h-4 w-4" />
-            Back to Form
+            Back to measurements
           </Button>
 
-          <Card className="border-border bg-card shadow-lg overflow-hidden">
-            {/* Risk Score Header */}
-            <div className={`${colors.bg} border-b ${colors.border} px-6 py-8`}>
-              <div className="flex items-center gap-4">
-                <div className={`flex h-16 w-16 items-center justify-center rounded-full ${colors.bg} border-2 ${colors.border}`}>
-                  <IconComponent className={`h-8 w-8 ${colors.iconColor}`} />
-                </div>
-                <div>
-                  <p className={`font-display text-3xl font-bold ${colors.textColor}`}>
-                    {result.riskScore}%
-                  </p>
-                  <p className={`text-sm font-semibold ${colors.textColor}`}>Risk Score</p>
-                </div>
+          <Card className="overflow-hidden border-border bg-card shadow-lg">
+            <CardHeader className={malignantPattern ? "border-b border-destructive/20 bg-destructive/5" : "border-b border-border bg-muted/40"}>
+              <CardTitle className="flex items-center gap-3 font-display text-xl text-card-foreground">
+                <AlertTriangle className="h-6 w-6 text-primary" />
+                Educational model output
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-6 pt-6">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Predicted cell-measurement pattern</p>
+                <p className="mt-2 font-display text-3xl font-bold text-foreground">
+                  {malignantPattern ? "Malignant-pattern" : "Benign-pattern"}
+                </p>
               </div>
-              <p className={`mt-4 font-display text-2xl font-bold ${colors.textColor}`}>
-                {colors.label}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {result.riskCategory === "high" &&
-                  "Your risk assessment indicates elevated risk. Please consult with a healthcare provider immediately."}
-                {result.riskCategory === "moderate" &&
-                  "Your risk assessment indicates moderate risk. Regular screening and lifestyle modifications are recommended."}
-                {result.riskCategory === "low" &&
-                  "Your risk assessment indicates low risk. Continue with routine screening as recommended for your age."}
-              </p>
-            </div>
 
-            <CardContent className="pt-8">
-              {/* Uploaded Photo */}
+              <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4" role="alert">
+                <p className="font-semibold text-foreground">This is not a diagnosis or a measure of your personal cancer risk.</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  A benign-pattern result cannot rule out cancer, and a malignant-pattern result does not confirm it. Do not use this output to make health decisions or delay care. Please discuss imaging and pathology results with a qualified healthcare professional.
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-border bg-muted/40 p-4">
+                <p className="font-semibold text-foreground">About this model</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Logistic regression trained on four mean cell measurements from the Wisconsin Diagnostic Breast Cancer dataset. A single held-out split during development had 87.7% accuracy and 73.8% sensitivity; these figures are not clinical validation and may not generalize to other data or people. Model: {result.modelVersion}.
+                </p>
+              </div>
+
               {result.photoUrl && (
-                <div className="mb-8">
-                  <h3 className="font-display text-xl font-semibold text-foreground mb-4">
-                    Submitted Photo
-                  </h3>
-                  <div className="rounded-lg overflow-hidden border border-border/30 bg-muted p-4">
-                    <img
-                      src={result.photoUrl}
-                      alt="Medical assessment photo"
-                      className="max-h-64 w-auto mx-auto object-contain"
-                    />
-                    {result.photoFileName && (
-                      <p className="text-xs text-muted-foreground mt-3 text-center">
-                        File: {result.photoFileName}
-                      </p>
-                    )}
+                <div className="grid gap-4">
+                  <h3 className="font-display text-xl font-semibold text-foreground">Submitted photo</h3>
+                  <div className="rounded-lg border border-border/30 bg-muted p-4">
+                    <img src={result.photoUrl} alt="Uploaded for non-diagnostic visual review" className="mx-auto max-h-64 w-auto object-contain" />
+                    {result.photoFileName && <p className="mt-3 text-center text-xs text-muted-foreground">File: {result.photoFileName}</p>}
                   </div>
                   {result.photoAnalysis && (
-                    <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
                       <p className="mb-2 text-sm font-semibold text-foreground">Non-diagnostic visual review</p>
                       <p className="text-sm leading-relaxed text-muted-foreground">{result.photoAnalysis}</p>
-                      <p className="mt-3 text-xs font-medium text-muted-foreground">This review cannot diagnose or rule out breast cancer. A qualified clinician must evaluate any concerning change.</p>
+                      <p className="mt-3 text-xs font-medium text-muted-foreground">A photo cannot diagnose or rule out breast cancer. Have any concerning change evaluated by a clinician.</p>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Identified Risk Factors */}
-              {result.riskFactors.length > 0 && (
-                <div className="mb-8">
-                  <h3 className="font-display text-xl font-semibold text-foreground mb-4">
-                    Identified Risk Factors
-                  </h3>
-                  <div className="grid gap-3">
-                    {result.riskFactors.map((factor, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-3 rounded-lg bg-muted px-4 py-3"
-                      >
-                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <p className="text-sm text-card-foreground">{factor}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Recommendations */}
-              <div className="mb-8">
-                <h3 className="font-display text-xl font-semibold text-foreground mb-4">
-                  Personalized Recommendations
-                </h3>
-                <div className="grid gap-3">
-                  {result.recommendations.map((rec, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3"
-                    >
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                      <p className="text-sm text-card-foreground">{rec}</p>
-                    </div>
-                  ))}
-                </div>
+              <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-4">
+                <Info className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  This experimental educational tool is not cleared or validated for clinical use. It is not a substitute for medical advice, diagnosis, or treatment. If you have a health concern, contact a qualified healthcare professional.
+                </p>
               </div>
 
-              {/* Next Steps */}
-              <div className="rounded-lg bg-muted px-4 py-4">
-                <h4 className="font-display text-lg font-semibold text-foreground mb-3">
-                  Next Steps
-                </h4>
-                <div className="space-y-2 text-sm text-card-foreground">
-                  <p>
-                    <strong>1. Schedule a consultation:</strong> Book an appointment with your healthcare provider to discuss these results.
-                  </p>
-                  <p>
-                    <strong>2. Share your results:</strong> Print or save this assessment to share with your doctor.
-                  </p>
-                  <p>
-                    <strong>3. Screening plan:</strong> Work with your healthcare provider to establish a personalized screening schedule.
-                  </p>
-                  <p>
-                    <strong>4. Lifestyle changes:</strong> Implement recommended lifestyle modifications to reduce modifiable risk factors.
-                  </p>
-                </div>
-              </div>
-
-              {/* Medical Disclaimer */}
-              <div className="mt-8 flex items-start gap-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-4">
-                <Info className="mt-0.5 h-5 w-5 shrink-0 text-yellow-700" />
-                <div>
-                  <p className="font-semibold text-yellow-900 mb-1">Important Medical Disclaimer</p>
-                  <p className="text-xs leading-relaxed text-yellow-800">
-                    This risk assessment tool is for educational and informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment.
-                    This tool does not provide actual medical diagnosis and should not be used for self-diagnosis. Always consult with a qualified healthcare professional, such as a doctor
-                    or oncologist, for proper evaluation and diagnosis. Your actual risk may vary based on additional factors not included in this assessment.
-                  </p>
-                </div>
-              </div>
-
-              {/* Support Resources */}
-              <div className="mt-8 rounded-lg border border-border bg-card p-6">
-                <h4 className="font-display text-lg font-semibold text-foreground mb-4">
-                  Helpful Resources
-                </h4>
-                <div className="grid gap-3 text-sm">
-                  <p>
-                    <strong>American Cancer Society:</strong> 1-800-227-2345 or
-                    visit cancer.org
-                  </p>
-                  <p>
-                    <strong>National Breast Cancer Foundation:</strong> 1-800-986-9505
-                  </p>
-                  <p>
-                    <strong>Cancer Support Community:</strong> Counseling and support
-                    groups at cancersupportcommunity.org
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-8 flex gap-3">
-                <Button
-                  onClick={onReset}
-                  size="lg"
-                  className="flex-1 font-semibold"
-                >
-                  Take Assessment Again
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => window.print()}
-                >
-                  Print Results
-                </Button>
+              <div className="flex gap-3">
+                <Button onClick={onReset} size="lg" className="flex-1 font-semibold">Try another sample</Button>
+                <Button variant="outline" size="lg" onClick={() => window.print()}>Print</Button>
               </div>
             </CardContent>
           </Card>

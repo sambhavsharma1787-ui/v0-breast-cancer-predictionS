@@ -25,13 +25,13 @@ export function AboutSection() {
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-3xl text-center mb-16">
           <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">
-            💡 About Breast Cancer
+            About the model
           </p>
           <h2 className="text-4xl md:text-5xl font-bold text-foreground text-balance mb-6">
-            Early Detection Changes Everything
+            A research dataset, not a clinical tool
           </h2>
           <p className="text-lg leading-relaxed text-muted-foreground">
-            Breast cancer occurs when abnormal cells in the breast grow uncontrollably. The good news: when detected early, the 5-year survival rate is over 99%. Our prediction tool helps you understand your risk factors and take proactive steps.
+            This demonstration uses the Wisconsin Diagnostic Breast Cancer dataset and a logistic-regression classifier trained on four mean cell measurements. The dataset contains research samples labeled benign or malignant; this small educational model is not clinically validated and cannot assess an individual&apos;s health.
           </p>
         </div>
 
