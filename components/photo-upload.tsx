@@ -23,6 +23,7 @@ export function PhotoUpload({
   const [isUploading, setIsUploading] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [error, setError] = useState<string>("")
+  const [billingRequired, setBillingRequired] = useState(false)
   const [preview, setPreview] = useState<string>("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
@@ -31,19 +32,20 @@ export function PhotoUpload({
     if (!file) return
 
     setError("")
-    setSelectedFile(file)
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image file (JPEG, PNG, etc.)")
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("Please select a JPEG, PNG, or WebP image.")
+      event.target.value = ""
       return
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError("Image size must be less than 5MB")
+      event.target.value = ""
       return
     }
+
+    setSelectedFile(file)
 
     // Create preview
     const reader = new FileReader()
@@ -85,11 +87,13 @@ export function PhotoUpload({
     if (!selectedFile || !uploadedPhoto || isAnalyzing) return
     setIsAnalyzing(true)
     setError("")
+    setBillingRequired(false)
     try {
       const body = new FormData()
       body.append("file", selectedFile)
       const response = await fetch("/api/photo-analysis", { method: "POST", body })
       const data = await response.json()
+      if (data.code === "AI_BILLING_REQUIRED") setBillingRequired(true)
       if (!response.ok) throw new Error(data.error || "Analysis failed")
       onPhotoUpload(uploadedPhoto.url, uploadedPhoto.fileName, data.analysis)
     } catch (analysisError) {
@@ -175,16 +179,28 @@ export function PhotoUpload({
       )}
 
       {error && (
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
-          <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0" />
-          <p className="text-sm text-destructive">{error}</p>
+        <div role="alert" className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+          <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-destructive">
+            <p>{error}</p>
+            {billingRequired && (
+              <a
+                href="https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dadd-credit-card"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1 inline-block font-medium underline underline-offset-2"
+              >
+                Open AI Gateway billing settings
+              </a>
+            )}
+          </div>
         </div>
       )}
 
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         onChange={handleFileChange}
         disabled={disabled || isUploading}
         className="hidden"
